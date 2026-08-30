@@ -2,7 +2,7 @@ import datetime
 
 from sqlalchemy import text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-import enum
+import enum 
 from typing import Annotated
 
 created_at = Annotated[datetime.datetime, mapped_column(server_default=text("CURRENT_TIMESTAMP('utc', now())"))]
@@ -22,6 +22,6 @@ class TaskOrm(Base):
     task_title: Mapped[str]
     description: Mapped[str | None]
     is_completed: Mapped[bool] = mapped_column(default=False)
-    priority: Mapped[Priority]
+    priority: Priority
     created_at: Mapped[created_at]
     deadline: Mapped[datetime.date | None]

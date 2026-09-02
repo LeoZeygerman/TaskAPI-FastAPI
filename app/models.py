@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import text
+from sqlalchemy import func, text, Enum
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 import enum 
 from typing import Annotated
@@ -22,6 +22,8 @@ class TaskOrm(Base):
     task_title: Mapped[str]
     description: Mapped[str | None]
     is_completed: Mapped[bool] = mapped_column(default=False)
-    priority: Priority
-    created_at: Mapped[created_at]
+    priority: Mapped[Priority] = mapped_column(Enum(Priority))
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        server_default=func.now()
+    )
     deadline: Mapped[datetime.date | None]

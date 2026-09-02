@@ -9,9 +9,10 @@ router = APIRouter(prefix='/tasks', tags=['Задачи'])
 @router.post('/', summary = 'Добавить задачу')
 async def add_task(session: SessionDep, task: CreateTask):
     new_task = TaskOrm(
-        title = task.task_title,
-        descriptiom = task.description,
+        task_title = task.task_title,
+        description = task.description,
         is_completed = task.is_completed,
+        priority = task.priority,
         deadline = task.deadline
     )
 
@@ -22,7 +23,7 @@ async def add_task(session: SessionDep, task: CreateTask):
 
 @router.get('/get_task/{task_id}', summary= 'Получить одну задачу', response_model=ResponseTask)
 async def get_one_task(session: SessionDep, task_id: int):
-    query = select(TaskOrm).where(task_id = TaskOrm.id)
+    query = select(TaskOrm).where(TaskOrm.id == task_id) 
     result = await session.execute(query)
     task = result.scalar_one_or_none()
     if task is None:

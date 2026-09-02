@@ -55,3 +55,16 @@ async def edit_task(session: SessionDep, task_id: int, task: UpdateTask):
 
     await session.commit()
     return task_db
+
+@router.delete('/delete/{task_id}', summary='Удаление задачи')
+async def delete_task(session: SessionDep, task_id: int):
+    query = select(TaskOrm).where(TaskOrm.id == task_id)
+    result = await session.execute(query)
+    task_db = result.scalar_one_or_none()
+
+    if task_db is None:
+        raise HTTPException(status_code=404, detail='Задача не найдена')
+
+    await session.delete(task_db)
+    await session.commit()
+    return {'msg': f'Задача {task_db.task_title} удалена!'}

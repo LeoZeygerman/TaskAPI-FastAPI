@@ -28,3 +28,10 @@ async def get_one_task(session: SessionDep, task_id: int):
     if book is None:
         raise HTTPException(status_code=404, detail='Книга не найдена')
     return book
+
+@router.get('/get_all', summary='Показать все задачи', response_model=list[ResponseTask])
+async def get_all(session: SessionDep):
+    query = select(TaskOrm)
+    result = await session.execute(query)
+    book = result.scalars().all()
+    return book

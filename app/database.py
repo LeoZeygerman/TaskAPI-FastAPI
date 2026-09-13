@@ -1,5 +1,4 @@
 from typing import Annotated
-
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from app.config import settings

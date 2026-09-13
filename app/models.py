@@ -11,7 +11,7 @@ class SubjectOrm(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str]
 
-    detail: Mapped[list['SubjectDetailOrm']] = relationship(back_populates='subject')
+    detail: Mapped[list['SubjectDetailOrm']] = relationship(back_populates='title')
 
 class SubjectDetailOrm(Base):
     __tablename__ = 'subject detail'
@@ -22,4 +22,4 @@ class SubjectDetailOrm(Base):
     deadline: Mapped[date]
 
     subject_id: Mapped[int] = mapped_column(ForeignKey('subject.id'))
-    subject: Mapped['SubjectOrm'] = relationship(back_populates='detail')
+    title: Mapped['SubjectOrm'] = relationship(back_populates='detail')

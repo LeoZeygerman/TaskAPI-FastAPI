@@ -1,6 +1,7 @@
 from fastapi import APIRouter
+from sqlalchemy import select
 from app.database import SessionDep
-from app.schemas import CreateSubject, ResponseDetail, CreateDetail
+from app.schemas import CreateSubject, ResponseDetail, CreateDetail, ResponseSubjectsWithDetail
 from app.models import SubjectDetailOrm, SubjectOrm
 
 router = APIRouter(prefix='/subject', tags=['Предметы'])
@@ -21,3 +22,8 @@ async def add_subject(session: SessionDep, subject: CreateDetail):
     await session.refresh(new_subject_detail)
     print('Предмет добавлен!')
     return new_subject_detail
+
+
+@router.get('/all', summary='Показать все предметы', response_model=ResponseSubjectsWithDetail)
+async def get_all_subjects(session: SessionDep):
+    query = select(SubjectDetailOrm)

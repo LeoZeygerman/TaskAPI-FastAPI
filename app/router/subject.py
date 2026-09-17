@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from app.database import SessionDep
 from app.schemas import CreateSubject, ResponseDetail, CreateDetail, ResponseSubjectsWithDetail
 from app.models import SubjectDetailOrm, SubjectOrm
@@ -24,6 +25,24 @@ async def add_subject(session: SessionDep, subject: CreateDetail):
     return new_subject_detail
 
 
-@router.get('/all', summary='Показать все предметы', response_model=ResponseSubjectsWithDetail)
+@router.get('/all', summary='Показать все предметы', response_model=list[ResponseSubjectsWithDetail])
 async def get_all_subjects(session: SessionDep):
-    query = select(SubjectDetailOrm)
+    query = (select(SubjectDetailOrm)
+             .options(selectinload(SubjectDetailOrm.subject)))
+    result = await session.execute(query)
+    subjects = result.scalars().all()
+    if not subjects:
+        raise HTTPException(status_code=404, detail='Предметов нет!')
+    return subjects
+
+
+@router.get('/{subject_name}', summary='Найти предмет', response_model=list[ResponseDetail])
+async def get_one_by_name(session: SessionDep, subject_name: str):
+    query = (select(SubjectDetailOrm)
+             .where(SubjectDetailOrm.subject.title == subject_name)
+             .options(selectinload(SubjectDetailOrm.subject)))
+    result = await session.execute(query)
+    subjects = result.scalars().all()
+    if not subjects:
+        raise HTTPException(status_code=404, detail='Предмет не найден!')
+    return subjects

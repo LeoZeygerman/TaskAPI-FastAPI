@@ -72,3 +72,19 @@ async def patch_subject(session: SessionDep, subject_id: int, subject: UpdateDet
     await session.commit()
     await session.refresh(db_subject)
     return db_subject
+
+
+@router.delete('/delete/{subject_id}', summary='Удалить предмет')
+async def delete_subject(session: SessionDep, subject_id: int):
+    query = (select(SubjectDetailOrm)
+             .join(SubjectDetailOrm.subject)
+             .where(SubjectOrm.id == subject_id)
+             .options(selectinload(SubjectDetailOrm.subject)))
+    result = await session.execute(query)
+    subject = result.scalar_one_or_none()
+
+    if not subject:
+        raise HTTPException(status_code=404, detail='Предмет не найден!')
+    await session.delete(subject)
+    await session.commit()
+    return f'Предмет {subject.title} удален!'

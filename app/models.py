@@ -9,12 +9,12 @@ class SubjectOrm(Base):
     __tablename__ = 'subject'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str]
+    subject_title: Mapped[str]
 
-    detail: Mapped[list['SubjectDetailOrm']] = relationship(back_populates='subject')
+    detail: Mapped['SubjectDetailOrm'] = relationship(back_populates='subjects')
 
 class SubjectDetailOrm(Base):
-    __tablename__ = 'subject detail'
+    __tablename__ = 'subject_detail'
 
     id: Mapped[int] = mapped_column(primary_key=True)
     target: Mapped[str]
@@ -22,4 +22,4 @@ class SubjectDetailOrm(Base):
     deadline: Mapped[date]
 
     subject_id: Mapped[int] = mapped_column(ForeignKey('subject.id'))
-    subject: Mapped['SubjectOrm'] = relationship(back_populates='detail')
+    subjects: Mapped['SubjectOrm'] = relationship(back_populates='detail')

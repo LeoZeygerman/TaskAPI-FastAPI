@@ -6,7 +6,7 @@ class CreateSubject(BaseModel):
 
 
 class CreateDetail(BaseModel):
-    title: CreateSubject
+    subject_title: str
     target: str = Field(min_length=10, max_length=100)
     hours_a_day: int = Field(gt=0, lt=24)
     deadline: date
@@ -21,11 +21,13 @@ class ResponseSubject(BaseModel):
 
 class ResponseDetail(BaseModel):
     id: int
-    title: ResponseSubject
+    subject: ResponseSubject
     target: str
     hours_a_day: int 
     deadline: date
-
+    @property
+    def subject_title(self) -> str:
+        return self.subject.title
     model_config = ConfigDict(from_attributes=True)    
 
 

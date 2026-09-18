@@ -7,11 +7,11 @@ from app.models import SubjectDetailOrm, SubjectOrm
 
 router = APIRouter(prefix='/subject', tags=['Предметы'])
 
-@router.post('/', summary='Добавить предмет', response_model=ResponseDetail)
+@router.post('/', summary='Добавить предмет')
 async def add_subject(session: SessionDep, subject: CreateDetail):
-    new_subject = SubjectOrm(title = subject.title)
+    new_subject = SubjectOrm(subject_title = subject.subject_title)
     new_subject_detail = SubjectDetailOrm(
-        subject = new_subject,
+        subjects = new_subject,
         target = subject.target,
         hours_a_day = subject.hours_a_day,
         deadline = subject.deadline
@@ -20,15 +20,16 @@ async def add_subject(session: SessionDep, subject: CreateDetail):
     session.add(new_subject)
     session.add(new_subject_detail)
     await session.commit()
-    await session.refresh(new_subject_detail)
-    print('Предмет добавлен!')
-    return new_subject_detail
-
-
-@router.get('/all', summary='Показать все предметы', response_model=list[ResponseSubjectsWithDetail])
+    query = (select(SubjectDetailOrm)
+             .where(SubjectDetailOrm.id == new_subject_detail.id)
+             .options(selectinload(SubjectDetailOrm.subjects)))
+    result = await session.execute(query)
+    new_subject_detail2 = result.scalar_one_or_none()
+    return f'Предмет {new_subject_detail2.subjects} успешно добавлен!'
+@router.get('/all', summary='Показать все предметы', response_model=ResponseSubjectsWithDetail)
 async def get_all_subjects(session: SessionDep):
     query = (select(SubjectDetailOrm)
-             .options(selectinload(SubjectDetailOrm.subject)))
+             .options(selectinload(SubjectDetailOrm.subjects)))
     result = await session.execute(query)
     subjects = result.scalars().all()
     if not subjects:
